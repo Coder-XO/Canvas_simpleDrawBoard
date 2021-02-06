@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,  minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"><!--定义文档视口,防止网页缩放-->
+    <meta name="keywords" content=""><!--网页的关键字信息-->
+    <meta name="description" content=""><!--网页的简介-->
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"><!--使用IE最新内核-->
+    <title>标题</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        let canvas = document.getElementById("canvas");   //获取canvas元素
+        canvas.width = document.documentElement.clientWidth;  //把canvas的宽设置为屏幕的宽
+        canvas.height = document.documentElement.clientHeight;  //把canvas的高设置为屏幕的高
+
+        let ctx = canvas.getContext("2d");
+        let painting = false;  // 设置鼠标摁下时触发画画
+        let last;  //  存储每一次画线的末尾位置
+
+        ctx.fillStyle = "black";   // 填充黑色
+        ctx.strockStyle = "none"; 
+        ctx.lineWidth = 10;
+        ctx.lineCap = "round";  
+
+        function drawLine(x1,y1,x2,y2) {
+            ctx.beginPath();
+            ctx.moveTo(x1,y1);
+            ctx.lineTo(x2,y2);
+            ctx.stroke();
+        }
+
+        let isTouchDevice = "ontouchstart" in document.documentElement;   //  判断是否为触摸设备
+
+        if(isTouchDevice) {   // 触摸设备画画
+            canvas.ontouchstart = (e) => {
+                let x = e.touches[0].clientX;
+                let y = e.touches[0].clientY;
+                last = [x,y];
+            }
+            canvas.ontouchmove = (e) => {
+                let x = e.touches[0].clientX;
+                let y = e.touches[0].clientY;
+                drawLine(last[0],last[1],x,y);
+                last = [x,y];
+            }
+        } else {
+
+            canvas.onmousemove = (e) => {   // 鼠标移动开始画画
+                if(painting === true){
+                    if (painting === true) {
+                        drawLine(last[0],last[1],e.clientX,e.clientY);  // 调用划线函数
+                        last = [e.clientX,e.clientY];
+                    } 
+                }
+            }
+
+            canvas.onmousedown = (e) => {   // 鼠标按下即可触发画画
+                painting = true;
+                last = [e.clientX,e.clientY];
+            }
+
+            canvas.onmouseup = () => {   // 鼠标抬起停止画画
+                painting = false
+            }
+        }
+    </script>
+</body>
+</html>
